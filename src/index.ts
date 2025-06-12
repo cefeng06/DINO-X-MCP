@@ -13,15 +13,10 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
-  ListResourcesRequestSchema,
   ListToolsRequestSchema,
-  ReadResourceRequestSchema,
-  ListPromptsRequestSchema,
-  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { DinoXApiClient } from "./dino-x/client.js";
-import { parseArgs } from "./utils/index.js";
-import { APIResponse } from "./types/index.js";
+import { parseArgs, parseBbox, parsePoseKeypoints } from "./utils/index.js";
 
 /**
  * Type alias for a note object.
@@ -51,46 +46,6 @@ const server = new Server(
     },
   }
 );
-
-/**
- * Handler for listing available notes as resources.
- * Each note is exposed as a resource with:
- * - A note:// URI scheme
- * - Plain text MIME type
- * - Human readable name and description (now including the note title)
- */
-// server.setRequestHandler(ListResourcesRequestSchema, async () => {
-//   return {
-//     resources: Object.entries(notes).map(([id, note]) => ({
-//       uri: `note:///${id}`,
-//       mimeType: "text/plain",
-//       name: note.title,
-//       description: `A text note: ${note.title}`
-//     }))
-//   };
-// });
-
-/**
- * Handler for reading the contents of a specific note.
- * Takes a note:// URI and returns the note content as plain text.
- */
-// server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-//   const url = new URL(request.params.uri);
-//   const id = url.pathname.replace(/^\//, '');
-//   const note = notes[id];
-
-//   if (!note) {
-//     throw new Error(`Note ${id} not found`);
-//   }
-
-//   return {
-//     contents: [{
-//       uri: request.params.uri,
-//       mimeType: "text/plain",
-//       text: note.content
-//     }]
-//   };
-// });
 
 /**
  * Handler that lists available tools.
@@ -123,7 +78,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "detect-all-objects",
-        description: "Analyze an image to detect all identifiable objects, returning the category, count, and coordinate positions for each object.",
+        description: "Analyze an image to detect all identifiable objects, returning the category, count, coordinate positions and detailed descriptions for each object.",
         inputSchema: {
           type: "object",
           properties: {
@@ -139,6 +94,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ["imageFileUri", "includeDescription"]
         }
       },
+      {
+        name: "detect-human-pose-keypoints",
+        description: "Detects 17 keypoints for each person in an image, supporting body posture and movement analysis.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            imageFileUri: {
+              type: "string",
+              description: `URI of the input image. Preferred for remote or local files. Must start with "https://" or "file://".`,
+            },
+            includeDescription: {
+              type: "boolean",
+              description: "Whether to return a description of the objects detected in the image, but will take longer to process.",
+            }
+          },
+          required: ["imageFileUri", "includeDescription"]
+        }
+      }
     ]
   };
 });
@@ -150,10 +123,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const args = parseArgs();
   const apiKey = args["dinox-api-key"] || process.env.DINOX_API_KEY || "";
+  const baseUrl = "https://api.deepdataspace.com/v2/";
 
   if (!apiKey) {
     throw new Error("dinox-api-key is required");
   }
+
+  const dinoXClient = new DinoXApiClient({
+    apiKey,
+    baseUrl,
+    timeout: 60000
+  });
 
   switch (request.params.name) {
     case "object-detection-by-text": {
@@ -165,7 +145,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error("Image file URI and text prompt are required");
       }
 
-      const dinoXClient = new DinoXApiClient(apiKey);
       const { objects } = await dinoXClient.detectObjectsByText(imageFileUri, textPrompt, withCaption);
 
       const categories: {
@@ -184,14 +163,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const objectsInfo = objects.map(obj => {
+        const bbox = parseBbox(obj.bbox);
         return {
           name: obj.category,
-          bbox: {
-            xmin: obj.bbox[0],
-            ymin: obj.bbox[1],
-            xmax: obj.bbox[2],
-            ymax: obj.bbox[3]
-          },
+          bbox,
           ...(withCaption ? {
             description: obj.caption,
           } : {}),
@@ -225,7 +200,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error("Image file URI is required");
       }
 
-      const dinoXClient = new DinoXApiClient(apiKey);
       const { objects } = await dinoXClient.detectAllObjects(imageFileUri, withCaption);
 
       const categories: {
@@ -244,14 +218,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const objectsInfo = objects.map(obj => {
+        const bbox = parseBbox(obj.bbox);
         return {
           name: obj.category,
-          bbox: {
-            xmin: obj.bbox[0],
-            ymin: obj.bbox[1],
-            xmax: obj.bbox[2],
-            ymax: obj.bbox[3]
-          },
+          bbox,
           ...(withCaption ? {
             description: obj.caption,
           } : {}),
@@ -277,68 +247,69 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ]
       };
     }
+    case "detect-human-pose-keypoints": {
+      const imageFileUri = String(request.params.arguments?.imageFileUri);
+      const withCaption = Boolean(request.params.arguments?.includeDescription);
+
+      if (!imageFileUri) {
+        throw new Error("Image file URI is required");
+      }
+
+      const { objects } = await dinoXClient.detectHumanPoseKeypoints(imageFileUri, withCaption);
+
+      const categories: {
+        [key: string]: {
+          category: string;
+          score: number;
+          bbox: [number, number, number, number];
+          pose?: number[];
+        }[]
+      } = {};
+
+      for (const object of objects) {
+        if (!categories[object.category]) {
+          categories[object.category] = [];
+        }
+        categories[object.category].push(object);
+      }
+
+      const objectsInfo = objects.map(obj => {
+        const bbox = parseBbox(obj.bbox);
+        const pose = obj.pose ? parsePoseKeypoints(obj.pose) : undefined;
+
+        return {
+          name: obj.category,
+          bbox,
+          pose,
+          ...(withCaption ? {
+            description: obj.caption,
+          } : {}),
+        }
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: `${objectsInfo.length} human(s) detected in image.`
+          },
+          {
+            type: "text",
+            text: `Detailed human pose keypoints detection results: ${JSON.stringify((objectsInfo), null, 2)}`
+          },
+          {
+            type: "text",
+            text: `Note: The bbox coordinates are in {xmin, ymin, xmax, ymax} format, where the origin (0,0) is at the top-left corner of the image. The pose keypoints follow the same coordinate system, with visibility states (not visible, visible).`
+          },
+        ]
+      };
+    }
     default: {
       throw new Error("Unknown tool");
     }
   }
 });
 
-/**
- * Handler that lists available prompts.
- * Exposes a single "summarize_notes" prompt that summarizes all notes.
- */
-// server.setRequestHandler(ListPromptsRequestSchema, async () => {
-//   return {
-//     prompts: [
-//       {
-//         name: "summarize_notes",
-//         description: "Summarize all notes",
-//       }
-//     ]
-//   };
-// });
-
-/**
- * Handler for the summarize_notes prompt.
- * Returns a prompt that requests summarization of all notes, with the notes' contents embedded as resources.
- */
-// server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-//   if (request.params.name !== "summarize_notes") {
-//     throw new Error("Unknown prompt");
-//   }
-
-//   const embeddedNotes = Object.entries(notes).map(([id, note]) => ({
-//     type: "resource" as const,
-//     resource: {
-//       uri: `note:///${id}`,
-//       mimeType: "text/plain",
-//       text: note.content
-//     }
-//   }));
-
-//   return {
-//     messages: [
-//       {
-//         role: "user",
-//         content: {
-//           type: "text",
-//           text: "Please summarize the following notes:"
-//         }
-//       },
-//       ...embeddedNotes.map(note => ({
-//         role: "user" as const,
-//         content: note
-//       })),
-//       {
-//         role: "user",
-//         content: {
-//           type: "text",
-//           text: "Provide a concise summary of all the notes above."
-//         }
-//       }
-//     ]
-//   };
-// });
 
 /**
  * Start the server using stdio transport.

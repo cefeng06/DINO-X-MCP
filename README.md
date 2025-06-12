@@ -59,8 +59,12 @@ For other MCP-compatible clients, refer to their documentation to add server con
 
 Restart your MCP client, and you should be able to use the following tools:
 
-- `object-detection-by-text`: Detect and locate specific objects in images based on text prompts
-- `detect-all-objects`: Detect and locate all identifiable objects in images
+| Method Name                   | Description                                                                   | Input               | Return                          |
+| ----------------------------- | ----------------------------------------------------------------------------- | ------------------- | -------------------------------- |
+| `object-detection-by-text`    | Detects and localizes objects in an image based on a natural language prompt. | Image + Text prompt | Bounding boxes + object captions |
+| `detect-all-objects`          | Detects and localizes all recognizable objects in an image.                   | Image               | Category names + bounding boxes + captions |
+| `detect-human-pose-keypoints` | Detects 17 human body keypoints per person in an image for pose estimation.   | Image               | Keypoint coordinates and captions  |
+
 
 ## 🛠️ Development
 
@@ -86,7 +90,7 @@ pnpm run inspector
 
 - Local file paths (starting with `file://`)
 - Remote URLs (starting with `https://`)
-- Common image formats: JPG, JPEG, PNG, WebP.
+- Common image formats: JPG, JPEG, PNG, WEBP
 
 ### API Limitations
 

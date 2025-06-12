@@ -12,18 +12,12 @@ export interface TaskResponse<T> {
 }
 
 export namespace APIResponse {
-
   export interface DINOX {
     objects: {
       category: string;
       score: number;
       bbox: [number, number, number, number];
-    }[]
-  }
-
-  export interface DINOXSeek {
-    objects: {
-      bbox: [number, number, number, number];
+      pose?: number[];
     }[]
   }
 

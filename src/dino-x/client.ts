@@ -2,16 +2,23 @@ import axios, { AxiosInstance } from "axios";
 import fs from "fs";
 import { APIResponse, TaskResponse } from "../types/index.js";
 
+export interface DinoXApiConfig {
+  apiKey: string;
+  baseUrl: string;
+  timeout: number;
+}
+
 export class DinoXApiClient {
   private readonly apiKey: string;
-  private readonly baseUrl = "https://api.deepdataspace.com/v2/";
+  private readonly baseUrl: string;
   private readonly axiosClient: AxiosInstance;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(config: DinoXApiConfig) {
+    this.apiKey = config.apiKey;
+    this.baseUrl = config.baseUrl;
     this.axiosClient = axios.create({
       baseURL: this.baseUrl,
-      timeout: 120000,
+      timeout: config.timeout,
       maxBodyLength: Infinity,
       maxContentLength: Infinity,
       headers: {
@@ -184,6 +191,72 @@ export class DinoXApiClient {
           universal: 1
         },
         targets: ["bbox"],
+        bbox_threshold: 0.25,
+        iou_threshold: 0.8
+      };
+
+      const detectionRsp = await this.createTask<APIResponse.DINOX>("dinox/detection", detactionApiPayload);
+
+      if (!includeDescription || detectionRsp.objects.length === 0) return detectionRsp;
+
+      const regions = detectionRsp.objects.map(obj => obj.bbox);
+      const captionApiPayload = {
+        model: "DINO-X-1.0",
+        image: imageDataUri,
+        regions,
+        targets: ["caption"],
+      };
+      const captionRsp = await this.createTask<APIResponse.DINOXRegionVL>("dinox/region_vl", captionApiPayload);
+      const objects = detectionRsp.objects.map((obj, index) => {
+        const captionObj = captionRsp.objects[index];
+        return {
+          ...obj,
+          ...captionObj,
+        };
+      });
+      return {
+        objects,
+      };
+
+    } catch (error) {
+      console.error("API request error:", error);
+      throw error;
+    }
+  }
+
+  async detectHumanPoseKeypoints(
+    imageFileUri: string,
+    includeDescription: boolean
+  ): Promise<{
+    objects: {
+      category: string;
+      score: number;
+      bbox: [number, number, number, number];
+      pose?: number[];
+      caption?: string;
+    }[]
+  }> {
+    let imageDataUri: string;
+    if (imageFileUri.startsWith("file://")) {
+      const imageFilePath = imageFileUri.replace('file://', '');
+      const imageBuffer = await fs.promises.readFile(imageFilePath);
+      const base64Image = imageBuffer.toString('base64');
+      imageDataUri = `data:image/png;base64,${base64Image}`;
+    } else if (imageFileUri.startsWith("https://")) {
+      imageDataUri = imageFileUri;
+    } else {
+      throw new Error("Invalid image file URI");
+    }
+
+    try {
+      const detactionApiPayload = {
+        model: "DINO-X-1.0",
+        image: imageDataUri,
+        prompt: {
+          type: "text",
+          text: "person"
+        },
+        targets: ["bbox", "pose_keypoints"],
         bbox_threshold: 0.25,
         iou_threshold: 0.8
       };
