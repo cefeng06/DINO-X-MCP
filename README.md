@@ -1,44 +1,41 @@
 # DINO-X MCP
 
+**English** | [中文](README_ZH.md)
+
 <p align="center">
 
-Official DINO-X Model Context Protocol (MCP) server that empowers LLMs with real-world visual perception through image object detection, localization, and captioning APIs. This server allows MCP clients like <a href="https://www.cursor.so">Cursor</a>, <a href="https://codeium.com/windsurf">Windsurf</a>, <a href="https://github.com/openai/openai-agents-python">OpenAI Agents</a> and others to detect objects, analyze scenes, generate descriptions and more.
+Enables large language models to perform fine-grained object detection and image understanding, powered by DINO-X and Grounding DINO 1.6 API.
+
 </p>
+
 
 ## 🚀 Quick Start
 
-### 1. Get API Key
+### 1. Prerequisites
 
-Get your API key from [DINO-X Platform](https://cloud.deepdataspace.com/request_api).
+Make sure you have Node.js installed. If you don't have Node.js, download it from [nodejs.org](https://nodejs.org/).
 
-### 2. Clone and Build Project
+Also, choose an AI assistants and applications that support the MCP Client, including but not limited to:
 
-```bash
-# Clone the project
-git clone https://github.com/IDEA-Research/DINO-X-MCP.git
-cd DINO-X—MCP
+- [Cursor](https://www.cursor.com/)
+- [WindSurf](https://windsurf.com/)
+- [Trae](https://www.trae.ai/)
+- [Cherry Studio](https://www.cherry-ai.com/)
 
-# Install dependencies
-pnpm install
+### 2. Configure MCP Sever
 
-# Build the project
-pnpm run build
-```
+You can use DINO-X MCP server in two ways:
 
-### 3. Configure MCP Client
+#### Option A: Using NPM Package 👍
 
-After building, you need to configure the server in your MCP client. Here are configuration methods for different clients:
-
-#### Cursor
-
-Add the following configuration in Cursor's MCP settings:
+Add the following configuration in your MCP client:
 
 ```json
 {
   "mcpServers": {
-    "dinox": {
-      "command": "node",
-      "args": ["/path/to/mcp-server-dinox/build/index.js"],
+    "dinox-mcp": {
+      "command": "npx",
+      "args": ["-y", "@deepdataspace/dinox-mcp"],
       "env": {
         "DINOX_API_KEY": "your-api-key-here"
       }
@@ -47,23 +44,66 @@ Add the following configuration in Cursor's MCP settings:
 }
 ```
 
-#### Other MCP Clients
+#### Option B: Using Local Project
 
-For other MCP-compatible clients, refer to their documentation to add server configuration with the following parameters:
+First, clone and build the project:
 
-- **Command**: `node`
-- **Arguments**: `["/path/to/mcp-server-dinox/build/index.js"]`
-- **Environment Variable**: `DINOX_API_KEY=your-api-key-here`
+```bash
+# Clone the project
+git clone https://github.com/IDEA-Research/DINO-X-MCP.git
+cd DINO-X-MCP
+
+# Install dependencies
+pnpm install
+
+# Build the project
+pnpm run build
+```
+
+Then configure your MCP client:
+
+```json
+{
+  "mcpServers": {
+    "dinox-mcp": {
+      "command": "node",
+      "args": ["/path/to/DINO-X-MCP/build/index.js"],
+      "env": {
+        "DINOX_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+### 3. Get API Key
+
+Get your API key from [DINO-X Platform](https://cloud.deepdataspace.com/request_api) (A free quota is available for new users).
+
+Replace `your-api-key-here` in the configuration above with your actual API key.
 
 ### 4. Available Tools
 
 Restart your MCP client, and you should be able to use the following tools:
 
-| Method Name                   | Description                                                                   | Input               | Return                          |
+| Method Name                   | Description                                                                   | Input               | Output                          |
 | ----------------------------- | ----------------------------------------------------------------------------- | ------------------- | -------------------------------- |
-| `object-detection-by-text`    | Detects and localizes objects in an image based on a natural language prompt. | Image + Text prompt | Bounding boxes + object captions |
 | `detect-all-objects`          | Detects and localizes all recognizable objects in an image.                   | Image               | Category names + bounding boxes + captions |
+| `object-detection-by-text`    | Detects and localizes objects in an image based on a natural language prompt. | Image + Text prompt | Bounding boxes + object captions |
 | `detect-human-pose-keypoints` | Detects 17 human body keypoints per person in an image for pose estimation.   | Image               | Keypoint coordinates and captions  |
+
+
+## 📝 Usage
+
+### Supported Image Formats
+
+- Remote URLs starting with `https://` 👍
+- Local file paths (starting with `file://`)
+- Common image formats: `jpg, jpeg, png, webp`
+
+### API Docs
+
+Please refer to [DINO-X Platform](https://cloud.deepdataspace.com/docs) for API usage limits and pricing information.
 
 
 ## 🛠️ Development
@@ -83,18 +123,6 @@ Use MCP Inspector to debug the server:
 ```bash
 pnpm run inspector
 ```
-
-## 📝 Usage
-
-### Supported Image Formats
-
-- Local file paths (starting with `file://`)
-- Remote URLs (starting with `https://`)
-- Common image formats: JPG, JPEG, PNG, WEBP
-
-### API Limitations
-
-Please refer to [DINO-X Platform](https://cloud.deepdataspace.com/docs) for API usage limits and pricing information.
 
 ## License
 

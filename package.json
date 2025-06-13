@@ -1,11 +1,11 @@
 {
-  "name": "DINO-X-MCP",
-  "version": "0.1.0",
+  "name": "@deepdataspace/dinox-mcp",
+  "version": "0.1.1",
   "description": "Official DINO-X Model Context Protocol (MCP) server that empowers LLMs with real-world visual perception through image object detection, localization, and captioning APIs.",
-  "private": true,
   "type": "module",
+  "homepage": "https://github.com/IDEA-Research/DINO-X-MCP",
   "bin": {
-    "DINO-X-MCP": "./build/index.js"
+    "dinox-mcp": "./build/index.js"
   },
   "files": [
     "build"
