@@ -8,6 +8,162 @@ DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 
 
 </p>
 
+## 💡 为什么需要 DINO-X MCP？
+
+尽管多模态模型可以理解和描述图像，但它们往往缺乏对视觉内容的精确定位和高质量的结构化输出。
+
+而借助 DINO-X MCP 后, 你可以：
+
+🧠 实现图像的细粒度理解: 支持全图识别、定向检测。
+
+🎯 精准获取目标数量、位置、属性, 并以此为依据进行图像问答等任务。
+
+🧩 支持与其他 MCP Server 组合，构建多步视觉工作流。
+
+🛠️ 构建自然语言驱动的视觉智能体，用于真实场景的自动化任务。
+
+## 🎬 应用案例
+
+<div align="center">
+  <table style="border-collapse: collapse; margin: 20px 0;">
+    <thead>
+      <tr style="background-color: #f8f9fa;">
+        <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">🎯 场景</th>
+        <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">📝 输入</th>
+        <th style="padding: 12px; border: 1px solid #dee2e6; font-weight: bold;">✨ 输出</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>检测定位</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              帮我框选森林里的着火范围，并用 Canvas 可视化
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/1-1.jpg" width="320" alt="原始森林火灾图像" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/1-2.png" width="350" alt="火灾检测可视化结果" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>物体计数</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              请帮我分析这张仓库图片，检测其中的所有纸箱, 统计总数量，然后创建一个完整的Canvas可视化网页展示。
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/2-1.jpeg" width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/2-2.png" width="350"  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          <!-- <br/>
+          <small style="color: #666; margin-top: 12px; display: block; font-style: italic;">可视化结果</small> -->
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>属性特征检测</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              找到图中所有红色的车，并用 Canvas 可视化展示
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/4-1.jpg" width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/4-2.png" width="350"  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>属性推理</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              找到图中最高的人，并描述他的着装，用 Canvas 可视化结果
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/5-1.jpg" width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/5-2.png" width="350"  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          <br/>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>全图检测</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              找到图中维生素C含量最高的水果
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/6-1.png" width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/6-2.png" width="350"  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          <br/>
+          <small style="color: #666; margin-top: 12px; display: block; font-style: italic;">答案：猕猴桃（93mg/100g）</small>
+        </td>
+      </tr>
+      <tr>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; vertical-align: center;">
+          <strong>人体姿态分析</strong>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: top;">
+          <div style="margin-bottom: 15px;">
+            <strong style="display: block; margin-bottom: 8px;">💬 提示词：</strong>
+            <code style="background-color: #f1f3f4; padding: 10px; border-radius: 6px; display: inline-block; word-break: break-word;">
+              请分析这是什么瑜伽姿势，并用 canvas 将关键点叠加在原图上显示
+            </code>
+          </div>
+          <div>
+            <strong style="display: block; margin-bottom: 8px;">🖼️ 输入图片：</strong>
+            <img src="/assets/examples/3-1.jpg" width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+          </div>
+        </td>
+        <td align="center" style="padding: 20px; border: 1px solid #dee2e6; width: 40%; vertical-align: center;">
+          <img src="/assets/examples/3-2.png" width="350"  style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
 ## 🚀 快速开始
 
 ### 1. 环境准备
