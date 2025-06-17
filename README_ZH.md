@@ -1,6 +1,6 @@
 # DINO-X MCP
 
-[English](README_EN.md) | **中文**
+[English](README.md) | **中文**
 
 <p align="center">
 
@@ -26,12 +26,12 @@ DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 
 
 | 🎯 场景 | 📝 输入 | ✨ 输出 |
 |---------|---------|---------|
-| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的着火范围，并用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/1-1.jpg" width="280" alt="原始森林火灾图像"/> | <img src="/assets/examples/1-2.png" width="400" alt="火灾检测可视化结果"/> |
-| **物体计数** | **💬 提示词：**<br>`请帮我分析这张仓库图片，检测其中的所有纸箱, 统计总数量，然后创建一个完整的Canvas可视化网页展示。`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/2-1.jpeg" width="280" alt="仓库图片"/> | <img src="/assets/examples/2-2.png" width="400" alt="纸箱检测结果"/> |
-| **特征检测** | **💬 提示词：**<br>`找到图中所有红色的车，并用 Canvas 可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/4-1.jpg" width="280" alt="车辆图片"/> | <img src="/assets/examples/4-2.png" width="400" alt="红色车辆检测结果"/> |
-| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，并描述他的着装，用 Canvas 可视化结果`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/5-1.jpg" width="280" alt="人物图片"/> | <img src="/assets/examples/5-2.png" width="400" alt="人物检测结果"/> |
-| **全图检测** | **💬 提示词：**<br>`找到图中维生素C含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/6-1.png" width="280" alt="水果图片"/> | <img src="/assets/examples/6-2.png" width="400" alt="水果检测结果"/><br><br>*答案：猕猴桃（93mg/100g）* |
-| **姿态分析** | **💬 提示词：**<br>`请分析这是什么瑜伽姿势，并用 canvas 将关键点叠加在原图上显示`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/3-1.jpg" width="280" alt="瑜伽姿势图片"/> | <img src="/assets/examples/3-2.png" width="400" alt="姿态检测结果"/> |
+| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围，并用`<br>`Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/1-1.jpg" style="width: 200px" /> | <img src="/assets/examples/1-2.png" style="width: 400px" /> |
+| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="/assets/examples/2-2.png" style="width: 400px" /> |
+| **特征检测** | **💬 提示词：**<br>`找到图中所有`<br>`红色的车，并用`<br>`Canvas 可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/4-1.jpg" style="width: 200px" /> | <img src="/assets/examples/4-2.png" style="width: 400px" /> |
+| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/5-1.jpg" style="width: 200px" /> | <img src="/assets/examples/5-2.png" style="width: 400px" /> |
+| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/6-1.png" style="width: 200px" /> | <img src="/assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
+| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/3-1.jpg" style="width: 200px" /> | <img src="/assets/examples/3-2.png" style="width: 400px" /> |
 
 
 ## 🚀 快速开始
