@@ -26,19 +26,57 @@ DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 
 
 | 🎯 场景 | 📝 输入 | ✨ 输出 |
 |---------|---------|---------|
-| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围，并用`<br>`Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/1-1.jpg" style="width: 200px" /> | <img src="/assets/examples/1-2.png" style="width: 400px" /> |
-| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="/assets/examples/2-2.png" style="width: 400px" /> |
-| **特征检测** | **💬 提示词：**<br>`找到图中所有`<br>`红色的车，并用`<br>`Canvas 可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/4-1.jpg" style="width: 200px" /> | <img src="/assets/examples/4-2.png" style="width: 400px" /> |
-| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/5-1.jpg" style="width: 200px" /> | <img src="/assets/examples/5-2.png" style="width: 400px" /> |
-| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/6-1.png" style="width: 200px" /> | <img src="/assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
-| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="/assets/examples/3-1.jpg" style="width: 200px" /> | <img src="/assets/examples/3-2.png" style="width: 400px" /> |
+| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围，并用`<br>`Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
+| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
+| **特征检测** | **💬 提示词：**<br>`找到图中所有`<br>`红色的车，并用`<br>`Canvas 可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
+| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
+| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
+| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-2.png" style="width: 400px" /> |
 
 
 ## 🚀 快速开始
 
 ### 1. 环境准备
 
-确保本地已经安装了 [Node.js](https://nodejs.org/)
+你可以选择以下任一方式安装 Node.js：
+
+#### 方式一：使用命令安装
+
+```bash
+# MacOS 或 Linux 系统
+# 1. 安装 nvm (Node 版本管理器)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# 或
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+# 2. 将以下配置添加到你的终端配置文件中（~/.bash_profile、~/.zshrc、~/.profile 或 ~/.bashrc）
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  
+
+# 3. 在当前终端中激活 nvm
+# bash 用户运行：
+source ~/.bashrc
+# zsh 用户运行：
+source ~/.zshrc   
+
+# 4. 验证 nvm 是否安装成功
+command -v nvm
+
+# 5. 安装并使用 Node.js LTS 版本
+nvm install --lts
+nvm use --lts
+
+# Windows 系统
+winget install OpenJS.NodeJS.LTS
+# 或使用 PowerShell (管理员权限)
+iwr -useb https://raw.githubusercontent.com/chocolatey/chocolatey/master/chocolateyInstall/InstallChocolatey.ps1 | iex
+choco install nodejs-lts -y
+```
+
+#### 方式二：手动下载安装
+
+从 [Node.js 官网](https://nodejs.org/) 下载安装包
 
 同时, 选择一个支持 MCP 协议的 AI 助手或客户端，包括但不限于：
 

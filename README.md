@@ -25,19 +25,56 @@ With DINO-X MCP, you can:
 ## 🎬 Use Case
 | 🎯 Scenario | 📝 Input | ✨ Output |
 |---------|---------|---------|
-| **Detection & Localization** | **💬 Prompt:**<br>`Detect the fire areas`<br>`in the forest and visualize`<br>`with Canvas`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/1-1.jpg" style="width: 200px" /> | <img src="/assets/examples/1-2.png" style="width: 400px" /> |
-| **Object Counting** | **💬 Prompt:**<br>`Please analyze this`<br>`warehouse image, detect`<br>`all the cardboard boxes,`<br>`count the total number`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="/assets/examples/2-2.png" style="width: 400px" /> |
-| **Feature Detection** | **💬 Prompt:**<br>`Find all red cars`<br>`in the image`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/4-1.jpg" style="width: 200px" /> | <img src="/assets/examples/4-3.png" style="width: 400px" /> |
-| **Attribute Reasoning** | **💬 Prompt:**<br>`Find the tallest person`<br>`in the image, describe`<br>`their clothing`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/5-1.jpg" style="width: 200px" /> | <img src="/assets/examples/5-3.png" style="width: 400px" /> |
-| **Full Scene Detection** | **💬 Prompt:**<br>`Find the fruit with`<br>`the highest vitamin C`<br>`content in the image`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/6-1.png" style="width: 200px" /> | <img src="/assets/examples/6-3.png" style="width: 400px" /><br><br>*Answer: Kiwi fruit (93mg/100g)* |
-| **Pose Analysis** | **💬 Prompt:**<br>`Please analyze what`<br>`yoga pose this is`<br><br>**🖼️ Input Image:**<br><img src="/assets/examples/3-1.jpg" style="width: 200px" /> | <img src="/assets/examples/3-3.png" style="width: 400px" /> |
+| **Detection & Localization** | **💬 Prompt:**<br>`Detect the fire areas`<br>`in the forest and visualize`<br>`with Canvas`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
+| **Object Counting** | **💬 Prompt:**<br>`Please analyze this`<br>`warehouse image, detect`<br>`all the cardboard boxes,`<br>`count the total number`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
+| **Feature Detection** | **💬 Prompt:**<br>`Find all red cars`<br>`in the image`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-3.png" style="width: 400px" /> |
+| **Attribute Reasoning** | **💬 Prompt:**<br>`Find the tallest person`<br>`in the image, describe`<br>`their clothing`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-3.png" style="width: 400px" /> |
+| **Full Scene Detection** | **💬 Prompt:**<br>`Find the fruit with`<br>`the highest vitamin C`<br>`content in the image`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-3.png" style="width: 400px" /><br><br>*Answer: Kiwi fruit (93mg/100g)* |
+| **Pose Analysis** | **💬 Prompt:**<br>`Please analyze what`<br>`yoga pose this is`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-3.png" style="width: 400px" /> |
 
 
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
 
-Make sure you have Node.js installed. If you don't have Node.js, download it from [nodejs.org](https://nodejs.org/).
+You can install Node.js using one of the following methods:
+
+#### Option A: Command 👍
+
+```bash
+# For MacOS or Linux
+# 1. Install nvm (Node Version Manager)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# OR
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+
+# 2. Add these lines to your profile (~/.bash_profile, ~/.zshrc, ~/.profile, or ~/.bashrc)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  
+
+# 3. Activate nvm in current shell
+source ~/.bashrc
+# Or
+source ~/.zshrc   
+
+# 4. Verify nvm installation
+command -v nvm
+
+# 5. Install and use LTS version of Node.js
+nvm install --lts
+nvm use --lts
+
+# For Windows
+winget install OpenJS.NodeJS.LTS
+# Or using PowerShell (Administrator)
+iwr -useb https://raw.githubusercontent.com/chocolatey/chocolatey/master/chocolateyInstall/InstallChocolatey.ps1 | iex
+choco install nodejs-lts -y
+```
+
+#### Option B: Manual Installation
+
+Download the installer from [nodejs.org](https://nodejs.org/)
 
 Also, choose an AI assistants and applications that support the MCP Client, including but not limited to:
 
