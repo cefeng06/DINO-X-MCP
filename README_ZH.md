@@ -28,9 +28,9 @@ DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 
 
 | 🎯 场景 | 📝 输入 | ✨ 输出 |
 |---------|---------|---------|
-| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围，并用`<br>`Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
+| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围并可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
 | **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
-| **特征检测** | **💬 提示词：**<br>`找到图中所有`<br>`红色的车，并用`<br>`Canvas 可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
+| **特征检测** | **💬 提示词：**<br>`找到图中所有红色`<br>`的车，并可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
 | **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
 | **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
 | **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-2.png" style="width: 400px" /> |
@@ -100,7 +100,8 @@ choco install nodejs-lts -y
       "command": "npx",
       "args": ["-y", "@deepdataspace/dinox-mcp"],
       "env": {
-        "DINOX_API_KEY": "you-api-key-here"
+        "DINOX_API_KEY": "you-api-key-here",
+        "IMAGE_STORAGE_DIRECTORY": "/path/to/your/image/directory"
       }
     }
   }
@@ -132,7 +133,8 @@ pnpm run build
       "command": "node",
       "args": ["/path/to/DINO-X-MCP/build/index.js"],
       "env": {
-        "DINOX_API_KEY": "you-api-key-here"
+        "DINOX_API_KEY": "you-api-key-here",
+        "IMAGE_STORAGE_DIRECTORY": "/path/to/your/image/directory"
       }
     }
   }
@@ -145,7 +147,16 @@ pnpm run build
 
 获取 API Key 后，把上面配置中的 `you-api-key-here` 替换成真正的密钥。
 
-### 4. 支持的工具
+### 4. 环境变量配置
+
+DINO-X MCP 服务器支持以下环境变量：
+
+| 变量名 | 描述 | 是否必需 | 默认值 | 示例 |
+|--------|------|----------|--------|------|
+| `DINOX_API_KEY` | 用于身份验证的 DINO-X API 密钥 | **必需** | - | `your-api-key-here` |
+| `IMAGE_STORAGE_DIRECTORY` | 生成的可视化图像的保存目录 | 可选 | **macOS/Linux:** `/tmp/dinox-mcp`<br>**Windows:** `%TEMP%\dinox-mcp` | `/Users/admin/Downloads/dinox-images` |
+
+### 5. 支持的工具
 
 刷新 MCP 配置，就可以在大模型对话中使用以下功能：
 
@@ -154,6 +165,7 @@ pnpm run build
 | `全图万物检测`          | 检测并定位图像中所有可识别的物体                                           | 图片链接                | 每个物体的名称 + 2D框 + 详细描述        |
 | `指定目标检测`    | 指定一个或多个目标，检测它们的位置和详细描述                                     | 图片链接 + 目标名字      | 所有指定目标的2D框 + 详细描述              |
 | `人体姿态检测` | 检测图像中每个人的17个关键点，用于姿态动作分析                           | 图片链接                | 关键点坐标 + 描述                |
+| `检测结果可视化` | 在图像上绘制边界框和标签，可视化检测结果                                    | 图片链接 + 检测结果      | 标注后的图像保存到存储目录              |
 
 ## 📝 使用指引
 

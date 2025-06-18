@@ -16,7 +16,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { DinoXApiClient } from "./dino-x/client.js";
-import { parseArgs, parseBbox, parsePoseKeypoints } from "./utils/index.js";
+import { parseArgs, parseBbox, parsePoseKeypoints, visualizeDetections, type DetectionResult } from "./utils/index.js";
 
 /**
  * Type alias for a note object.
@@ -111,7 +111,57 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           required: ["imageFileUri", "includeDescription"]
         }
-      }
+      },
+      {
+        name: "visualize-detections",
+        description: "Visualize detection results by drawing bounding boxes and labels on the original image. Images are saved to the directory specified by IMAGE_STORAGE_DIRECTORY environment variable.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            imageFileUri: {
+              type: "string",
+              description: `URI of the input image. Preferred for remote or local files. Must start with "https://" or "file://".`,
+            },
+            detections: {
+              type: "array",
+              description: "Array of detection results with name and bbox information.",
+              items: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                    description: "Object category name"
+                  },
+                  bbox: {
+                    type: "object",
+                    properties: {
+                      xmin: { type: "number" },
+                      ymin: { type: "number" },
+                      xmax: { type: "number" },
+                      ymax: { type: "number" }
+                    },
+                    required: ["xmin", "ymin", "xmax", "ymax"]
+                  }
+                },
+                required: ["name", "bbox"]
+              }
+            },
+            fontSize: {
+              type: "number",
+              description: "Font size for labels (default: 24)"
+            },
+            boxThickness: {
+              type: "number", 
+              description: "Thickness of bounding box lines (default: 4)"
+            },
+            showLabels: {
+              type: "boolean",
+              description: "Whether to show category labels (default: true)"
+            }
+          },
+          required: ["imageFileUri", "detections"]
+        }
+      },
     ]
   };
 });
@@ -303,6 +353,36 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           },
         ]
       };
+    }
+    case "visualize-detections": {
+      const imageFileUri = String(request.params.arguments?.imageFileUri);
+      const detections = request.params.arguments?.detections as DetectionResult[];
+      const fontSize = request.params.arguments?.fontSize as number | undefined;
+      const boxThickness = request.params.arguments?.boxThickness as number | undefined;
+      const showLabels = request.params.arguments?.showLabels as boolean | undefined;
+
+      if (!imageFileUri || !detections || !Array.isArray(detections)) {
+        throw new Error("Image file URI and detections array are required");
+      }
+
+      try {
+        const visualizedImagePath = await visualizeDetections(imageFileUri, detections, {
+          fontSize,
+          boxThickness,
+          showLabels
+        });
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Visualization saved to: ${visualizedImagePath}`
+            },
+          ]
+        };
+      } catch (error) {
+        throw new Error(`Failed to visualize detections: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
     default: {
       throw new Error("Unknown tool");

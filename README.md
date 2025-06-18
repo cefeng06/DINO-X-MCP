@@ -27,10 +27,10 @@ With DINO-X MCP, you can:
 ## 🎬 Use Case
 | 🎯 Scenario | 📝 Input | ✨ Output |
 |---------|---------|---------|
-| **Detection & Localization** | **💬 Prompt:**<br>`Detect the fire areas`<br>`in the forest and visualize`<br>`with Canvas`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
+| **Detection & Localization** | **💬 Prompt:**<br>`Detect and visualize the `<br>`fire areas in the forest `<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
 | **Object Counting** | **💬 Prompt:**<br>`Please analyze this`<br>`warehouse image, detect`<br>`all the cardboard boxes,`<br>`count the total number`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
-| **Feature Detection** | **💬 Prompt:**<br>`Find all red cars`<br>`in the image`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-3.png" style="width: 400px" /> |
-| **Attribute Reasoning** | **💬 Prompt:**<br>`Find the tallest person`<br>`in the image, describe`<br>`their clothing`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-3.png" style="width: 400px" /> |
+| **Feature Detection** | **💬 Prompt:**<br>`Find all red cars`<br>`in the image`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
+| **Attribute Reasoning** | **💬 Prompt:**<br>`Find the tallest person`<br>`in the image, describe`<br>`their clothing`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
 | **Full Scene Detection** | **💬 Prompt:**<br>`Find the fruit with`<br>`the highest vitamin C`<br>`content in the image`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-3.png" style="width: 400px" /><br><br>*Answer: Kiwi fruit (93mg/100g)* |
 | **Pose Analysis** | **💬 Prompt:**<br>`Please analyze what`<br>`yoga pose this is`<br><br>**🖼️ Input Image:**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-3.png" style="width: 400px" /> |
 
@@ -100,7 +100,8 @@ Add the following configuration in your MCP client:
       "command": "npx",
       "args": ["-y", "@deepdataspace/dinox-mcp"],
       "env": {
-        "DINOX_API_KEY": "your-api-key-here"
+        "DINOX_API_KEY": "your-api-key-here",
+        "IMAGE_STORAGE_DIRECTORY": "/path/to/your/image/directory"
       }
     }
   }
@@ -132,7 +133,8 @@ Then configure your MCP client:
       "command": "node",
       "args": ["/path/to/DINO-X-MCP/build/index.js"],
       "env": {
-        "DINOX_API_KEY": "your-api-key-here"
+        "DINOX_API_KEY": "your-api-key-here",
+        "IMAGE_STORAGE_DIRECTORY": "/path/to/your/image/directory"
       }
     }
   }
@@ -145,7 +147,17 @@ Get your API key from [DINO-X Platform](https://cloud.deepdataspace.com/request_
 
 Replace `your-api-key-here` in the configuration above with your actual API key.
 
-### 4. Available Tools
+### 4. Environment Variables
+
+The DINO-X MCP server supports the following environment variables:
+
+| Variable Name | Description | Required | Default Value | Example |
+|---------------|-------------|----------|---------------|---------|
+| `DINOX_API_KEY` | Your DINO-X API key for authentication | **Required** | - | `your-api-key-here` |
+| `IMAGE_STORAGE_DIRECTORY` | Directory where generated visualization images will be saved | Optional | **macOS/Linux:** `/tmp/dinox-mcp`<br>**Windows:** `%TEMP%\dinox-mcp` | `/Users/admin/Downloads/dinox-images` |
+
+
+### 5. Available Tools
 
 Restart your MCP client, and you should be able to use the following tools:
 
@@ -154,6 +166,7 @@ Restart your MCP client, and you should be able to use the following tools:
 | `detect-all-objects`          | Detects and localizes all recognizable objects in an image.                   | Image               | Category names + bounding boxes + captions |
 | `object-detection-by-text`    | Detects and localizes objects in an image based on a natural language prompt. | Image + Text prompt | Bounding boxes + object captions |
 | `detect-human-pose-keypoints` | Detects 17 human body keypoints per person in an image for pose estimation.   | Image               | Keypoint coordinates and captions  |
+| `visualize-detections`        | Visualizes detection results by drawing bounding boxes and labels on the image. | Image + Detection results | Annotated image saved to storage directory |
 
 
 ## 📝 Usage
