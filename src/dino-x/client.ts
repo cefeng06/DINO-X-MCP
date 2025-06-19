@@ -25,6 +25,7 @@ export class DinoXApiClient {
         Token: `${this.apiKey}`,
         "Content-Type": "application/json",
         "Accept": "application/json",
+        "X-Client-Source": "mcp"
       },
     });
   }
