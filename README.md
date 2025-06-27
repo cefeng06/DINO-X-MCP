@@ -4,10 +4,13 @@
 
 **English** | [中文](README_ZH.md)
 
-<p align="center">
-
 Enables large language models to perform fine-grained object detection and image understanding, powered by DINO-X and Grounding DINO 1.6 API.
 
+<p align="center">
+  <video width="800" controls>
+    <source src="https://dds-frontend.oss-cn-shenzhen.aliyuncs.com/dinox-mcp/dinox-mcp-en-overveiw.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 </p>
 
 ## 💡 Why DINO-X MCP?

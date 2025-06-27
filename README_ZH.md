@@ -8,6 +8,13 @@
 
 DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 Grounding DINO 1.6 API，给大模型提供细粒度的目标检测与图像理解能力。
 
+<p align="center">
+  <video width="800" controls>
+    <source src="https://dds-frontend.oss-cn-shenzhen.aliyuncs.com/dinox-mcp/dinox-mcp-en-overveiw.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</p>
+
 </p>
 
 ## 💡 为什么需要 DINO-X MCP？
