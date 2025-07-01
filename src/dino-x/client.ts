@@ -8,6 +8,29 @@ export interface DinoXApiConfig {
   timeout: number;
 }
 
+interface DetectionPayload {
+  model: string;
+  image: string;
+  prompt: {
+    type: string;
+    text?: string;
+    universal?: number;
+  };
+  targets: string[];
+  bbox_threshold: number;
+  iou_threshold: number;
+}
+
+interface DetectionResult {
+  objects: {
+    category: string;
+    score: number;
+    bbox: [number, number, number, number];
+    pose?: number[];
+    caption?: string;
+  }[];
+}
+
 export class DinoXApiClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
@@ -91,203 +114,120 @@ export class DinoXApiClient {
     }
   }
 
-  async detectObjectsByText(
-    imageFileUri: string,
-    textPrompt: string,
-    includeDescription: boolean
-  ): Promise<{
-    objects: {
-      category: string;
-      score: number;
-      bbox: [number, number, number, number];
-      caption?: string;
-    }[]
-  }> {
-    let imageDataUri: string;
+  private async processImageUri(imageFileUri: string): Promise<string> {
     if (imageFileUri.startsWith("file://")) {
       const imageFilePath = imageFileUri.replace('file://', '');
       const imageBuffer = await fs.promises.readFile(imageFilePath);
       const base64Image = imageBuffer.toString('base64');
-      imageDataUri = `data:image/png;base64,${base64Image}`;
+      return `data:image/png;base64,${base64Image}`;
     } else if (imageFileUri.startsWith("https://")) {
-      imageDataUri = imageFileUri;
+      return imageFileUri;
     } else {
       throw new Error("Invalid image file URI");
     }
+  }
 
-    try {
-      const detactionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        prompt: {
-          type: "text",
-          text: textPrompt
-        },
-        targets: ["bbox"],
-        bbox_threshold: 0.25,
-        iou_threshold: 0.8
-      };
+  private async addDescriptions(
+    imageDataUri: string,
+    detectionResponse: APIResponse.DINOX
+  ): Promise<DetectionResult> {
+    if (detectionResponse.objects.length === 0) {
+      return detectionResponse;
+    }
 
-      const detectionRsp = await this.createTask<APIResponse.DINOX>("dinox/detection", detactionApiPayload);
+    const regions = detectionResponse.objects.map(obj => obj.bbox);
+    const captionApiPayload = {
+      model: "DINO-X-1.0",
+      image: imageDataUri,
+      regions,
+      targets: ["caption"],
+    };
 
-      if (!includeDescription || detectionRsp.objects.length === 0) return detectionRsp;
+    const captionRsp = await this.createTask<APIResponse.DINOXRegionVL>("dinox/region_vl", captionApiPayload);
 
-      const regions = detectionRsp.objects.map(obj => obj.bbox);
-      const captionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        regions,
-        targets: ["caption"],
-      };
-      const captionRsp = await this.createTask<APIResponse.DINOXRegionVL>("dinox/region_vl", captionApiPayload);
-
-      const objects = detectionRsp.objects.map((obj, index) => {
-        const captionObj = captionRsp.objects[index];
-        return {
-          ...obj,
-          ...captionObj,
-        };
-      });
-
+    const objects = detectionResponse.objects.map((obj, index) => {
+      const captionObj = captionRsp.objects[index];
       return {
-        objects,
+        ...obj,
+        ...captionObj,
+      };
+    });
+
+    return { objects };
+  }
+
+  private async performDetection(
+    imageFileUri: string,
+    includeDescription: boolean,
+    detectionPayload: Omit<DetectionPayload, 'image'>
+  ): Promise<DetectionResult> {
+    try {
+      const imageDataUri = await this.processImageUri(imageFileUri);
+      
+      const fullPayload = {
+        ...detectionPayload,
+        image: imageDataUri,
       };
 
+      const detectionRsp = await this.createTask<APIResponse.DINOX>("dinox/detection", fullPayload);
+
+      if (!includeDescription) {
+        return detectionRsp;
+      }
+
+      return await this.addDescriptions(imageDataUri, detectionRsp);
     } catch (error) {
       console.error("API request error:", error);
       throw error;
     }
+  }
 
+  async detectObjectsByText(
+    imageFileUri: string,
+    textPrompt: string,
+    includeDescription: boolean
+  ): Promise<DetectionResult> {
+    return this.performDetection(imageFileUri, includeDescription, {
+      model: "DINO-X-1.0",
+      prompt: {
+        type: "text",
+        text: textPrompt
+      },
+      targets: ["bbox"],
+      bbox_threshold: 0.25,
+      iou_threshold: 0.8
+    });
   }
 
   async detectAllObjects(
     imageFileUri: string,
     includeDescription: boolean
-  ): Promise<{
-    objects: {
-      category: string;
-      score: number;
-      bbox: [number, number, number, number];
-      caption?: string;
-    }[]
-  }> {
-    let imageDataUri: string;
-    if (imageFileUri.startsWith("file://")) {
-      const imageFilePath = imageFileUri.replace('file://', '');
-      const imageBuffer = await fs.promises.readFile(imageFilePath);
-      const base64Image = imageBuffer.toString('base64');
-      imageDataUri = `data:image/png;base64,${base64Image}`;
-    } else if (imageFileUri.startsWith("https://")) {
-      imageDataUri = imageFileUri;
-    } else {
-      throw new Error("Invalid image file URI");
-    }
-
-    try {
-      const detactionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        prompt: {
-          type: "universal",
-          universal: 1
-        },
-        targets: ["bbox"],
-        bbox_threshold: 0.25,
-        iou_threshold: 0.8
-      };
-
-      const detectionRsp = await this.createTask<APIResponse.DINOX>("dinox/detection", detactionApiPayload);
-
-      if (!includeDescription || detectionRsp.objects.length === 0) return detectionRsp;
-
-      const regions = detectionRsp.objects.map(obj => obj.bbox);
-      const captionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        regions,
-        targets: ["caption"],
-      };
-      const captionRsp = await this.createTask<APIResponse.DINOXRegionVL>("dinox/region_vl", captionApiPayload);
-      const objects = detectionRsp.objects.map((obj, index) => {
-        const captionObj = captionRsp.objects[index];
-        return {
-          ...obj,
-          ...captionObj,
-        };
-      });
-      return {
-        objects,
-      };
-
-    } catch (error) {
-      console.error("API request error:", error);
-      throw error;
-    }
+  ): Promise<DetectionResult> {
+    return this.performDetection(imageFileUri, includeDescription, {
+      model: "DINO-X-1.0",
+      prompt: {
+        type: "universal",
+        universal: 1
+      },
+      targets: ["bbox"],
+      bbox_threshold: 0.25,
+      iou_threshold: 0.8
+    });
   }
 
   async detectHumanPoseKeypoints(
     imageFileUri: string,
     includeDescription: boolean
-  ): Promise<{
-    objects: {
-      category: string;
-      score: number;
-      bbox: [number, number, number, number];
-      pose?: number[];
-      caption?: string;
-    }[]
-  }> {
-    let imageDataUri: string;
-    if (imageFileUri.startsWith("file://")) {
-      const imageFilePath = imageFileUri.replace('file://', '');
-      const imageBuffer = await fs.promises.readFile(imageFilePath);
-      const base64Image = imageBuffer.toString('base64');
-      imageDataUri = `data:image/png;base64,${base64Image}`;
-    } else if (imageFileUri.startsWith("https://")) {
-      imageDataUri = imageFileUri;
-    } else {
-      throw new Error("Invalid image file URI");
-    }
-
-    try {
-      const detactionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        prompt: {
-          type: "text",
-          text: "person"
-        },
-        targets: ["bbox", "pose_keypoints"],
-        bbox_threshold: 0.25,
-        iou_threshold: 0.8
-      };
-
-      const detectionRsp = await this.createTask<APIResponse.DINOX>("dinox/detection", detactionApiPayload);
-
-      if (!includeDescription || detectionRsp.objects.length === 0) return detectionRsp;
-
-      const regions = detectionRsp.objects.map(obj => obj.bbox);
-      const captionApiPayload = {
-        model: "DINO-X-1.0",
-        image: imageDataUri,
-        regions,
-        targets: ["caption"],
-      };
-      const captionRsp = await this.createTask<APIResponse.DINOXRegionVL>("dinox/region_vl", captionApiPayload);
-      const objects = detectionRsp.objects.map((obj, index) => {
-        const captionObj = captionRsp.objects[index];
-        return {
-          ...obj,
-          ...captionObj,
-        };
-      });
-      return {
-        objects,
-      };
-
-    } catch (error) {
-      console.error("API request error:", error);
-      throw error;
-    }
+  ): Promise<DetectionResult> {
+    return this.performDetection(imageFileUri, includeDescription, {
+      model: "DINO-X-1.0",
+      prompt: {
+        type: "text",
+        text: "person"
+      },
+      targets: ["bbox", "pose_keypoints"],
+      bbox_threshold: 0.25,
+      iou_threshold: 0.8
+    });
   }
 }
