@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import fs from "fs";
+import { fileURLToPath } from 'url';
 import { APIResponse, TaskResponse } from "../types/index.js";
 
 export interface DinoXApiConfig {
@@ -116,7 +117,7 @@ export class DinoXApiClient {
 
   private async processImageUri(imageFileUri: string): Promise<string> {
     if (imageFileUri.startsWith("file://")) {
-      const imageFilePath = imageFileUri.replace('file://', '');
+      const imageFilePath = fileURLToPath(imageFileUri);
       const imageBuffer = await fs.promises.readFile(imageFilePath);
       const base64Image = imageBuffer.toString('base64');
       return `data:image/png;base64,${base64Image}`;
