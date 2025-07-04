@@ -2,6 +2,7 @@ import { createCanvas, loadImage } from 'canvas';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { fileURLToPath } from 'url';
 
 export const parseArgs = () => {
   const args: Record<string, string> = {};
@@ -112,22 +113,13 @@ export async function visualizeDetections(
   detections: DetectionResult[],
   options: VisualizationOptions = {}
 ): Promise<string> {
-  // handle file URI
-  const imagePath = imageUri.startsWith('file://') 
-    ? imageUri.replace('file://', '') 
-    : imageUri;
-
-  // load original image
+  const imagePath = fileURLToPath(imageUri);
   const image = await loadImage(imagePath);
-  
-  // create canvas
+
   const canvas = createCanvas(image.width, image.height);
   const ctx = canvas.getContext('2d');
-  
-  // draw original image
   ctx.drawImage(image, 0, 0);
-  
-  // set default options
+
   const {
     fontSize = 24,
     boxThickness = 4,
