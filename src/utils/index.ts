@@ -121,7 +121,16 @@ export async function visualizeDetections(
   detections: DetectionResult[],
   options: VisualizationOptions = {}
 ): Promise<string> {
-  const imagePath = fileURLToPath(imageUri);
+
+  let imagePath = '';
+  if (imageUri.startsWith('file://')) {
+    imagePath = decodeURIComponent(fileURLToPath(imageUri));
+  } else if (imageUri.startsWith('https://')) {
+    imagePath = imageUri;
+  } else {
+    throw new Error('Invalid image file URI');
+  }
+
   const image = await loadImage(imagePath);
 
   const canvas = createCanvas(image.width, image.height);
