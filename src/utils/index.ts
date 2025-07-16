@@ -87,19 +87,27 @@ export interface VisualizationOptions {
   showConfidence?: boolean;
 }
 
+/** Saturation-0.9, Brightness-0.85, Hue Interval-137.5 */
+const DEFAULT_COLORS = ['#D91616', '#16D94F', '#8716D9', '#D9C016', '#16B8D9', '#D9167F', '#46D916', '#1E16D9', '#D95716', '#16D990', '#C816D9', '#B0D916', '#1677D9', '#D9163E', '#16D926', '#5F16D9', '#D99816', '#16D9D1', '#D916A8', '#6FD916'];
 
-const DEFAULT_COLORS = [
-  '#FF6B6B', // red
-  '#4ECDC4', // cyan
-  '#45B7D1', // blue
-  '#FFA07A', // light orange
-  '#98D8C8', // light green
-  '#F7DC6F', // yellow
-  '#BB8FCE', // purple
-  '#85C1E9', // sky blue
-  '#F8C471', // orange
-  '#82E0AA', // green
-];
+/**
+ * Get the appropriate font for the current platform
+ * @returns 
+ */
+function getPlatformFont(fontSize: number): string {
+  const platform = os.platform();
+
+  switch (platform) {
+    case 'win32':
+      return `${fontSize}px "Microsoft YaHei", "SimHei", "Segoe UI", "Arial Unicode MS", "Arial", "Verdana", "Tahoma", sans-serif`;
+    case 'darwin':
+      return `${fontSize}px "PingFang SC", "Helvetica Neue", "Arial Unicode MS", "San Francisco", ".AppleSystemUIFont", "Arial", "Times", sans-serif`;
+    case 'linux':
+      return `${fontSize}px "Noto Sans CJK SC", "WenQuanYi Micro Hei", "DejaVu Sans", "Liberation Sans", "Arial Unicode MS", "Arial", "Helvetica", sans-serif`;
+    default:
+      return `${fontSize}px "Arial Unicode MS", "Arial", "Helvetica", sans-serif`;
+  }
+}
 
 /**
  * Draw detection results on the image
@@ -136,50 +144,56 @@ export async function visualizeDetections(
       categoryColorMap.set(detection.name, colors[colorIndex % colors.length]);
       colorIndex++;
     }
-    
+
     const color = categoryColorMap.get(detection.name)!;
     const { bbox } = detection;
-    
+
     // draw bounding box
     ctx.strokeStyle = color;
     ctx.lineWidth = boxThickness;
     ctx.strokeRect(
-      bbox.xmin, 
-      bbox.ymin, 
-      bbox.xmax - bbox.xmin, 
+      bbox.xmin,
+      bbox.ymin,
+      bbox.xmax - bbox.xmin,
       bbox.ymax - bbox.ymin
     );
-    
+
     // draw label
     if (showLabels) {
       const label = detection.name;
-      
-      ctx.font = `${fontSize}px Arial`;
+
+      ctx.font = getPlatformFont(fontSize);
       ctx.fillStyle = color;
-      
+
       const textMetrics = ctx.measureText(label);
       const textWidth = textMetrics.width;
       const textHeight = fontSize;
-      
+
       const padding = 4;
+      
+      let labelY = bbox.ymin - textHeight - padding * 2;
+      if (labelY < 0) {
+        labelY = bbox.ymin;
+      }
+
       const bgX = bbox.xmin;
-      const bgY = bbox.ymin - textHeight - padding * 2;
+      const bgY = labelY;
       const bgWidth = textWidth + padding * 2;
       const bgHeight = textHeight + padding * 2;
-      
+
       ctx.fillStyle = color;
       ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
-      
+
       ctx.fillStyle = 'white';
       ctx.fillText(label, bgX + padding, bgY + padding + textHeight * 0.8);
     }
   }
-  
+
   const outputPath = options.outputPath || generateOutputPath(imagePath);
-  
+
   const buffer = canvas.toBuffer('image/png');
   fs.writeFileSync(outputPath, buffer);
-  
+
   return outputPath;
 }
 
@@ -189,7 +203,7 @@ export async function visualizeDetections(
  */
 function getDefaultImageStorageDirectory(): string {
   const platform = os.platform();
-  
+
   switch (platform) {
     case 'win32':
       return path.join(os.tmpdir(), 'dinox-mcp');
@@ -211,7 +225,7 @@ function getImageStorageDirectory(): string {
   if (envDir) {
     return envDir;
   }
-  
+
   return getDefaultImageStorageDirectory();
 }
 
@@ -233,10 +247,10 @@ function ensureDirectoryExists(dirPath: string): void {
 function generateOutputPath(originalPath: string): string {
   const storageDir = getImageStorageDirectory();
   ensureDirectoryExists(storageDir);
-  
+
   const ext = path.extname(originalPath);
   const basename = path.basename(originalPath, ext);
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  
+
   return path.join(storageDir, `${basename}_visualized_${timestamp}.png`);
 }
