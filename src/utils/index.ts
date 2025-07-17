@@ -79,7 +79,6 @@ export interface DetectionResult {
 }
 
 export interface VisualizationOptions {
-  outputPath?: string;
   fontSize?: number;
   boxThickness?: number;
   colors?: string[];
@@ -122,16 +121,21 @@ export async function visualizeDetections(
   options: VisualizationOptions = {}
 ): Promise<string> {
 
+  let image;
   let imagePath = '';
   if (imageUri.startsWith('file://')) {
-    imagePath = decodeURIComponent(fileURLToPath(imageUri));
+    const imagePath = decodeURIComponent(fileURLToPath(imageUri));
+    if (!fs.existsSync(imagePath)) {
+      throw new Error('Image file not found: ' + imagePath);
+    }
+    const imageBuffer = fs.readFileSync(imagePath); 
+    image = await loadImage(imageBuffer);
   } else if (imageUri.startsWith('https://')) {
     imagePath = imageUri;
+    image = await loadImage(imagePath);
   } else {
-    throw new Error('Invalid image file URI');
+    throw new Error('Invalid image file URI. Please use a valid file:// or https:// scheme.');
   }
-
-  const image = await loadImage(imagePath);
 
   const canvas = createCanvas(image.width, image.height);
   const ctx = canvas.getContext('2d');
@@ -198,7 +202,7 @@ export async function visualizeDetections(
     }
   }
 
-  const outputPath = options.outputPath || generateOutputPath(imagePath);
+  const outputPath = generateOutputPath(imagePath);
 
   const buffer = canvas.toBuffer('image/png');
   fs.writeFileSync(outputPath, buffer);
