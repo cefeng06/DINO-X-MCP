@@ -18,20 +18,9 @@ import {
 import { DinoXApiClient } from "./dino-x/client.js";
 import { parseArgs, parseBbox, parsePoseKeypoints, visualizeDetections, type DetectionResult } from "./utils/index.js";
 
-/**
- * Type alias for a note object.
- */
-type Note = { title: string, content: string };
 
 /**
- * Simple in-memory storage for notes.
- * In a real implementation, this would likely be backed by a database.
- */
-const notes: { [id: string]: Note } = {};
-
-/**
- * Create an MCP server with capabilities for resources (to list/read notes),
- * tools (to create new notes), and prompts (to summarize notes).
+ * Create an MCP server with capabilities for tools.
  */
 const server = new Server(
   {
@@ -40,16 +29,13 @@ const server = new Server(
   },
   {
     capabilities: {
-      resources: {},
       tools: {},
-      prompts: {},
     },
   }
 );
 
 /**
  * Handler that lists available tools.
- * Exposes a single "create_note" tool that lets clients create new notes.
  */
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
@@ -166,10 +152,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-/**
- * Handler for the create_note tool.
- * Creates a new note with the provided title and content, and returns success message.
- */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const args = parseArgs();
   const apiKey = args["dinox-api-key"] || process.env.DINOX_API_KEY || "";
