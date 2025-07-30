@@ -1,4 +1,4 @@
-import { createCanvas, loadImage } from 'canvas';
+import sharp from 'sharp';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -90,26 +90,42 @@ export interface VisualizationOptions {
 const DEFAULT_COLORS = ['#D91616', '#16D94F', '#8716D9', '#D9C016', '#16B8D9', '#D9167F', '#46D916', '#1E16D9', '#D95716', '#16D990', '#C816D9', '#B0D916', '#1677D9', '#D9163E', '#16D926', '#5F16D9', '#D99816', '#16D9D1', '#D916A8', '#6FD916'];
 
 /**
- * Get the appropriate font for the current platform
- * @returns 
+ * Get the appropriate font family for the current platform (for SVG)
+ * @returns font family string for SVG
  */
-function getPlatformFont(fontSize: number): string {
+function getPlatformFont(): string {
   const platform = os.platform();
 
+  let fontFamily: string;
   switch (platform) {
     case 'win32':
-      return `${fontSize}px "Microsoft YaHei", "SimHei", "Segoe UI", "Arial Unicode MS", "Arial", "Verdana", "Tahoma", sans-serif`;
+      fontFamily = '"Microsoft YaHei", "SimHei", "Segoe UI", "Arial Unicode MS", "Arial", "Verdana", "Tahoma", sans-serif';
+      break;
     case 'darwin':
-      return `${fontSize}px "PingFang SC", "Helvetica Neue", "Arial Unicode MS", "San Francisco", ".AppleSystemUIFont", "Arial", "Times", sans-serif`;
+      fontFamily = '"PingFang SC", "Helvetica Neue", "Arial Unicode MS", "San Francisco", ".AppleSystemUIFont", "Arial", "Times", sans-serif';
+      break;
     case 'linux':
-      return `${fontSize}px "Noto Sans CJK SC", "WenQuanYi Micro Hei", "DejaVu Sans", "Liberation Sans", "Arial Unicode MS", "Arial", "Helvetica", sans-serif`;
+      fontFamily = '"Noto Sans CJK SC", "WenQuanYi Micro Hei", "DejaVu Sans", "Liberation Sans", "Arial Unicode MS", "Arial", "Helvetica", sans-serif';
+      break;
     default:
-      return `${fontSize}px "Arial Unicode MS", "Arial", "Helvetica", sans-serif`;
+      fontFamily = '"Arial Unicode MS", "Arial", "Helvetica", sans-serif';
   }
+
+  return fontFamily;
 }
 
 /**
- * Draw detection results on the image
+ * Estimate text width for SVG
+ * @param text text to measure
+ * @param fontSize font size
+ * @returns estimated text width
+ */
+function estimateTextWidth(text: string, fontSize: number): number {
+  return text.length * fontSize * 0.6;
+}
+
+/**
+ * Draw detection results on the image using Sharp + SVG
  * @param imageUri image file path or URI
  * @param detections detection results array
  * @param options visualization options
@@ -121,25 +137,27 @@ export async function visualizeDetections(
   options: VisualizationOptions = {}
 ): Promise<string> {
 
-  let image;
+  let imageBuffer: Buffer;
   let imagePath = '';
+  
   if (imageUri.startsWith('file://')) {
-    const imagePath = decodeURIComponent(fileURLToPath(imageUri));
+    imagePath = decodeURIComponent(fileURLToPath(imageUri));
     if (!fs.existsSync(imagePath)) {
       throw new Error('Image file not found: ' + imagePath);
     }
-    const imageBuffer = fs.readFileSync(imagePath); 
-    image = await loadImage(imageBuffer);
+    imageBuffer = fs.readFileSync(imagePath);
   } else if (imageUri.startsWith('https://')) {
     imagePath = imageUri;
-    image = await loadImage(imagePath);
+    // For HTTPS URLs, we need to fetch the image
+    const response = await fetch(imageUri);
+    imageBuffer = Buffer.from(await response.arrayBuffer());
   } else {
     throw new Error('Invalid image file URI. Please use a valid file:// or https:// scheme.');
   }
 
-  const canvas = createCanvas(image.width, image.height);
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
+  // Get image metadata
+  const imageInfo = await sharp(imageBuffer).metadata();
+  const { width = 0, height = 0 } = imageInfo;
 
   const {
     fontSize = 24,
@@ -148,9 +166,14 @@ export async function visualizeDetections(
     showLabels = true,
   } = options;
 
-  // create category to color mapping
+  const fontFamily = getPlatformFont();
+
+  // Create category to color mapping
   const categoryColorMap = new Map<string, string>();
   let colorIndex = 0;
+
+  // Build SVG overlay with all annotations
+  const svgElements: string[] = [];
 
   for (const detection of detections) {
     if (!categoryColorMap.has(detection.name)) {
@@ -161,29 +184,18 @@ export async function visualizeDetections(
     const color = categoryColorMap.get(detection.name)!;
     const { bbox } = detection;
 
-    // draw bounding box
-    ctx.strokeStyle = color;
-    ctx.lineWidth = boxThickness;
-    ctx.strokeRect(
-      bbox.xmin,
-      bbox.ymin,
-      bbox.xmax - bbox.xmin,
-      bbox.ymax - bbox.ymin
-    );
+    const rectWidth = bbox.xmax - bbox.xmin;
+    const rectHeight = bbox.ymax - bbox.ymin;
 
-    // draw label
+    svgElements.push(`<rect x="${bbox.xmin}" y="${bbox.ymin}" width="${rectWidth}" height="${rectHeight}" fill="none" stroke="${color}" stroke-width="${boxThickness}" shape-rendering="crispEdges"/>`);
+
     if (showLabels) {
       const label = detection.name;
 
-      ctx.font = getPlatformFont(fontSize);
-      ctx.fillStyle = color;
-
-      const textMetrics = ctx.measureText(label);
-      const textWidth = textMetrics.width;
+      const textWidth = estimateTextWidth(label, fontSize);
       const textHeight = fontSize;
-
       const padding = 4;
-      
+
       let labelY = bbox.ymin - textHeight - padding * 2;
       if (labelY < 0) {
         labelY = bbox.ymin;
@@ -194,18 +206,46 @@ export async function visualizeDetections(
       const bgWidth = textWidth + padding * 2;
       const bgHeight = textHeight + padding * 2;
 
-      ctx.fillStyle = color;
-      ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
+      // Draw label background
+      svgElements.push(`<rect x="${bgX}" y="${bgY}" width="${bgWidth}" height="${bgHeight}" fill="${color}"/>`);
 
-      ctx.fillStyle = 'white';
-      ctx.fillText(label, bgX + padding, bgY + padding + textHeight * 0.8);
+      // Draw label text
+      const textX = bgX + padding;
+      const textY = bgY + padding + textHeight * 0.8;
+      
+      // Escape special characters in label text for XML
+      const escapedLabel = label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      
+      svgElements.push(`<text x="${textX}" y="${textY}" fill="white" font-size="${fontSize}" font-family='${fontFamily}' text-rendering="optimizeLegibility" dominant-baseline="alphabetic">${escapedLabel}</text>`);
     }
   }
 
+  // Generate complete SVG overlay
+  const svgOverlay = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <style>
+        text {
+          font-weight: normal;
+          text-rendering: optimizeLegibility;
+        }
+        rect {
+          shape-rendering: crispEdges;
+        }
+      </style>
+    </defs>
+    ${svgElements.join('\n    ')}
+  </svg>`;
+  
+  // Generate output path
   const outputPath = generateOutputPath(imagePath);
 
-  const buffer = canvas.toBuffer('image/png');
-  fs.writeFileSync(outputPath, buffer);
+  // Composite SVG overlay onto image using Sharp
+  await sharp(imageBuffer)
+    .composite([
+      { input: Buffer.from(svgOverlay), top: 0, left: 0 }
+    ])
+    .png({ quality: 100, compressionLevel: 6 })
+    .toFile(outputPath);
 
   return outputPath;
 }
