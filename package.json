@@ -19,8 +19,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "0.6.0",
     "axios": "^1.9.0",
-    "canvas": "^3.1.0",
-    "fs": "0.0.1-security"
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
