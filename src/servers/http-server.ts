@@ -30,7 +30,7 @@ export class MCPStreamHTTPServer {
 
     this.server = new McpServer({
       name: 'dinox-mcp-server',
-      version: '0.1.0',
+      version: '1.0.0',
     });
 
     this.registerTools();
