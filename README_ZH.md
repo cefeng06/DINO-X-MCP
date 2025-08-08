@@ -229,14 +229,12 @@ AUTH_TOKEN=my-token node build/index.js --http --enable-client-key
 
 | 场景 | 输入 | 输出 |
 |---------|---------|---------|
-| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围并可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
-| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
-| **特征检测** | **💬 提示词：**<br>`找到图中所有红色`<br>`的车，并可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
-| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
-| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
-| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-2.png" style="width: 400px" /> |
-
-
+| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围并可视化`<br><br>**🖼️ 输入图片：**<br>![1-1](https://github.com/user-attachments/assets/b5401c20-b7f2-4a8e-bc24-4eca54c48a92) | ![1-2](https://github.com/user-attachments/assets/8bc3c9fe-5a5a-4f10-af0a-552b797a00fc) |
+| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br>![2-1](https://github.com/user-attachments/assets/9d500523-4094-43fe-a6e5-5a714075dfd8) | <img width="1276" alt="2-2" src="https://github.com/user-attachments/assets/3f18ef8c-5e89-45fc-bd0f-f23381304272" /> |
+| **特征检测** | **💬 提示词：**<br>`找到图中所有红色`<br>`的车，并可视化展示`<br><br>**🖼️ 输入图片：**<br>![4-1](https://github.com/user-attachments/assets/3a5b0776-a932-447f-bc81-42c0536381e8)|![4-2](https://github.com/user-attachments/assets/410c2120-8c86-4f90-9ce1-c34fb3b1781a)|
+| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br>![5-1](https://github.com/user-attachments/assets/9ba4b77e-6d00-4257-9bdb-079a53ce4ca4) | ![5-2](https://github.com/user-attachments/assets/ef0ce3e1-1dd2-4bd7-a145-e1623c297911) |
+| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br>![6-1](https://github.com/user-attachments/assets/9cf9f475-6015-47d0-917e-5004a104d777)| ![6-3](https://github.com/user-attachments/assets/17466bc2-4b9a-4a74-9456-05c253b0b388)<br><br>*Answer: Kiwi fruit (93mg/100g)* |
+| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br>![3-1](https://github.com/user-attachments/assets/2b2a6b5a-939b-4c37-8f40-900ae921b07a) |![3-3](https://github.com/user-attachments/assets/41636813-aaf7-4ad0-a5c3-1a5cbe67c022)|
 
 
 ## 常见问题
