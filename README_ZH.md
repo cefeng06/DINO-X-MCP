@@ -1,12 +1,12 @@
 # DINO-X MCP
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![npm version](https://img.shields.io/npm/v/@deepdataspace/dinox-mcp.svg)](https://www.npmjs.com/package/@deepdataspace/dinox-mcp) [![npm downloads](https://img.shields.io/npm/dm/@deepdataspace/dinox-mcp.svg)](https://www.npmjs.com/package/@deepdataspace/dinox-mcp) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/IDEA-Research/DINO-X-MCP/pulls) [![GitHub stars](https://img.shields.io/github/stars/IDEA-Research/DINO-X-MCP.svg)](https://github.com/IDEA-Research/DINO-X-MCP/stargazers)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![npm version](https://img.shields.io/npm/v/@deepdataspace/dinox-mcp.svg)](https://www.npmjs.com/package/@deepdataspace/dinox-mcp) [![npm downloads](https://img.shields.io/npm/dm/@deepdataspace/dinox-mcp.svg)](https://www.npmjs.com/package/@deepdataspace/dinox-mcp) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/IDEA-Research/DINO-X-MCP/pulls) [![MCP Badge](https://lobehub.com/badge/mcp/idea-research-dino-x-mcp)](https://lobehub.com/mcp/idea-research-dino-x-mcp) [![GitHub stars](https://img.shields.io/github/stars/IDEA-Research/DINO-X-MCP.svg)](https://github.com/IDEA-Research/DINO-X-MCP/stargazers)
 
 [English](README.md) | **中文**
 
 <p align="center">
 
-DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 Grounding DINO 1.6 API，给大模型提供细粒度的目标检测与图像理解能力。
+DINO-X 官方 MCP 服务器, 基于通用视觉检测模型 DINO-X 和 Grounding DINO，给大模型提供细粒度的目标检测、图像理解、图片分析能力。
 
 <p align="center">
   <video width="800" controls>
@@ -17,39 +17,61 @@ DINO-X 官方 MCP 服务器, 基于全球领先的视觉检测模型 DINO-X 和 
 
 </p>
 
-## 💡 为什么需要 DINO-X MCP？
+## 为什么需要 DINO-X MCP？
 
-尽管多模态模型可以理解和描述图像，但它们往往缺乏对视觉内容的精确定位和高质量的结构化输出。
+- 精细理解：支持全图检测、定向检测与区域描述。
 
-而借助 DINO-X MCP 后, 你可以：
+- 结构化输出：可直接获取类别、数量、位置、属性，助力视觉问答与多步推理。
 
-🧠 实现图像的细粒度理解: 支持全图识别、定向检测。
+- 组合易用：可与其他 MCP Server 搭配，构建端到端视觉智能体与自动化流程。
 
-🎯 精准获取目标数量、位置、属性, 并以此为依据进行图像问答等任务。
+## 传输模式
 
-🧩 支持与其他 MCP Server 组合，构建多步视觉工作流。
+DINO-X MCP 支持两种传输模式:
 
-🛠️ 构建自然语言驱动的视觉智能体，用于真实场景的自动化任务。
+| 特性 | STDIO（默认） | Streamable HTTP |
+|:--|:--|:--|
+| 运行环境 | 本地 | 本地或云端 |
+| 通信方式 | 标准输入/输出 | `HTTP`（流式响应） |
+| 输入限制 | 支持 `file://` 与 `https://` | 仅支持 `https://` |
+| 可视化 | 支持（生成本地标注图片） | 暂不支持 |
 
-## 🎬 应用案例
-
-| 🎯 场景 | 📝 输入 | ✨ 输出 |
-|---------|---------|---------|
-| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围并可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
-| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
-| **特征检测** | **💬 提示词：**<br>`找到图中所有红色`<br>`的车，并可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
-| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
-| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
-| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-2.png" style="width: 400px" /> |
+## 快速接入
 
 
-## 🚀 快速开始
+### 1. 准备 MCP 客户端
 
-### 1. 环境准备
+首先, 你需要在本地安装一个支持 MCP 协议的客户端，例如：
 
-你可以选择以下任一方式安装 Node.js：
+- [Cursor](https://www.cursor.com/)
+- [WindSurf](https://windsurf.com/)
+- [Trae](https://www.trae.ai/)
+- [Cherry Studio](https://www.cherry-ai.com/)
 
-#### 方式一：使用命令安装
+### 2. 获取 API Key 
+
+前往 [DINO-X 官网](https://cloud.deepdataspace.com/request_api) 注册账号并申请 API Token（新用户有免费额度）。
+
+### 3. 配置 MCP
+
+#### 方式 A：使用官方托管的 Streamable HTTP（推荐）
+
+在客户端配置文件中添加，替换自己的 API Key：
+
+```json
+{
+  "mcpServers": {
+    "dinox-mcp": {
+      "url": "https://mcp.deepdataspace.com/mcp?key=your-api-key"
+      }
+    }
+  }
+}
+```
+
+#### 方式 B：使用 NPM 包本地运行（STDIO）
+
+首先，需要本地安装 `Node.js` 环境，可以从 [Node.js 官网](https://nodejs.org/) 下载安装包，或使用命令安装：
 
 ```bash
 # MacOS 或 Linux 系统
@@ -83,22 +105,7 @@ iwr -useb https://raw.githubusercontent.com/chocolatey/chocolatey/master/chocola
 choco install nodejs-lts -y
 ```
 
-#### 方式二：手动下载安装
-
-从 [Node.js 官网](https://nodejs.org/) 下载安装包
-
-同时, 选择一个支持 MCP 协议的 AI 助手或客户端，包括但不限于：
-
-- [Cursor](https://www.cursor.com/)
-- [WindSurf](https://windsurf.com/)
-- [Trae](https://www.trae.ai/)
-- [Cherry Studio](https://www.cherry-ai.com/)
-
-### 2. 配置 MCP 服务器
-
-#### 方式一：使用 NPM 安装包 👍
-
-在你的 MCP 客户端的配置文件中加入配置：
+然后，在你的 MCP 客户端的配置文件中加入配置：
 
 ```json
 {
@@ -115,9 +122,11 @@ choco install nodejs-lts -y
 }
 ```
 
-#### 方式二：使用本地项目
+注意：获取 API Key 后，把上面配置中的 `you-api-key-here` 替换成真正的密钥。
 
-首先，克隆本项目代码到本地并编译
+#### 方式 C：克隆源码本地运行
+
+首先，需要本地安装 `Node.js` 环境（参考方式二）
 
 ```bash
 # 下载源码
@@ -125,13 +134,13 @@ git clone https://github.com/IDEA-Research/DINO-X-MCP.git
 cd DINO-X-MCP
 
 # 安装依赖
-pnpm install
+npm install
 
 # 编译
-pnpm run build
+npm run build
 ```
 
-然后在 MCP 客户端中配置：
+MCP 客户端中配置：
 
 ```json
 {
@@ -148,57 +157,108 @@ pnpm run build
 }
 ```
 
-### 3. 获取API密钥
+## 启动参数与环境变量
 
-在 [DINO-X 官网](https://cloud.deepdataspace.com/request_api) 注册账号，新用户有免费 API 额度。
+- 常用启动参数
+  - `--http`：以 Streamable HTTP 方式启动；否则默认 STDIO
+  - `--stdio`：强制以 STDIO 启动
+  - `--dinox-api-key=...`：指定 API Key
+  - `--enable-client-key`：允许客户端通过 URL `?key=` 传入 API Key（Streamable HTTP 模式）
+  - `--port=8080`：HTTP 端口（默认 3020）
 
-获取 API Key 后，把上面配置中的 `you-api-key-here` 替换成真正的密钥。
+- 环境变量
+  - `DINOX_API_KEY`（必需/条件必需）：DINO-X 平台鉴权密钥
+  - `IMAGE_STORAGE_DIRECTORY`（可选，STDIO 模式）：可视化图片输出目录
+  - `AUTH_TOKEN`（可选，Streamable HTTP 模式）：若设置，则需客户端请求头携带 `Authorization: Bearer <token>`
 
-### 4. 环境变量配置
+示例：
+```bash
+# STDIO（本地）
+node build/index.js --dinox-api-key=your-api-key
 
-DINO-X MCP 服务器支持以下环境变量：
+# Streamable HTTP（服务端提供统一的 API Key）
+node build/index.js --http --dinox-api-key=your-api-key
 
-| 变量名 | 描述 | 是否必需 | 默认值 | 示例 |
-|--------|------|----------|--------|------|
-| `DINOX_API_KEY` | 用于身份验证的 DINO-X API 密钥 | **必需** | - | `your-api-key-here` |
-| `IMAGE_STORAGE_DIRECTORY` | 生成的可视化图像的保存目录 | 可选 | **macOS/Linux:** `/tmp/dinox-mcp`<br>**Windows:** `%TEMP%\dinox-mcp` | `/Users/admin/Downloads/dinox-images` |
+# Streamable HTTP（自定义端口）
+node build/index.js --http --dinox-api-key=your-api-key --port=8080
 
-### 5. 支持的工具
+# Streamable HTTP（强制客户端提供 API Key）
+node build/index.js --http --enable-client-key
 
-刷新 MCP 配置，就可以在大模型对话中使用以下功能：
+# 此时，客户端需要通过 ?key= 传入
+{
+  "mcpServers": {
+    "dinox-mcp": {
+      "url": "http://localhost:3020/mcp?key=your-api-key"
+    }
+  }
+}
 
-| 功能                          | 作用                                                                         | 输入            | 输出                      |
-| ----------------------------- | ---------------------------------------------------------------------------- | ------------------- | ------------------------------- |
-| `全图万物检测`          | 检测并定位图像中所有可识别的物体                                           | 图片链接                | 每个物体的名称 + 2D框 + 详细描述        |
-| `指定目标检测`    | 指定一个或多个目标，检测它们的位置和详细描述                                     | 图片链接 + 目标名字      | 所有指定目标的2D框 + 详细描述              |
-| `人体姿态检测` | 检测图像中每个人的17个关键点，用于姿态动作分析                           | 图片链接                | 关键点坐标 + 描述                |
-| `检测结果可视化` | 在图像上绘制边界框和标签，可视化检测结果                                    | 图片链接 + 检测结果      | 标注后的图像保存到存储目录              |
+# Streamable HTTP（启用 AUTH_TOKEN）
+AUTH_TOKEN=my-token node build/index.js --http --enable-client-key
 
-## 📝 使用指引
+# 此时，客户端可以借助 supergateway 传入 Authorization: Bearer <token>
+{
+  "mcpServers": {
+    "dinox-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--streamableHttp",
+        "http://localhost:3020/mcp?key=your-api-key",
+        "--oauth2Bearer",
+        "my-token"
+      ]
+    }
+  }
+}
 
-### 支持哪些图片格式？
+```
 
-- 推荐用 `https://` 开头的图片链接
-- 或用 `file://` 开头的完整路径
-- 常见格式：`jpg、jpeg、png、webp`
+## 🛠️ 功能支持
 
-### API 使用
+| 能力 | 工具 ID | 传输模式 | 输入 | 输出 |
+|:--|:--|:--|:--|:--|
+| 全图万物检测 | `detect-all-objects` | STDIO/HTTP | 图片链接 | 类别 + bbox +（可选）描述 |
+| 指定目标检测 | `detect-objects-by-text` | STDIO/HTTP | 图片链接 + 英文名词（用点号分隔多类，如 `person.car`） | 指定对象的 bbox +（可选）描述 |
+| 人体姿态检测 | `detect-human-pose-keypoints` | STDIO/HTTP | 图片链接 | 17 个关键点 + bbox +（可选）描述 |
+| 检测结果可视化 | `visualize-detection-result` | 仅 STDIO | 图片链接 + 检测结果数组 | 生成本地标注图片路径 |
 
-可以查看 [DINO-X API 文档](https://cloud.deepdataspace.com/docs)。
+## 应用案例
 
-## 🛠️ 开发者指引
+| 场景 | 输入 | 输出 |
+|---------|---------|---------|
+| **检测定位** | **💬 提示词：**<br>`帮我框选森林里的`<br>`着火范围并可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/1-1.jpg" style="width: 200px" /> | <img src="./assets/examples/1-2.png" style="width: 400px" /> |
+| **物体计数** | **💬 提示词：**<br>`请帮我分析这张`<br>`仓库图片，检测其中`<br>`的所有纸箱，统计`<br>`总数量`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/2-1.jpeg" style="width: 200px" /> | <img src="./assets/examples/2-2.png" style="width: 400px" /> |
+| **特征检测** | **💬 提示词：**<br>`找到图中所有红色`<br>`的车，并可视化展示`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/4-1.jpg" style="width: 200px" /> | <img src="./assets/examples/4-2.png" style="width: 400px" /> |
+| **属性推理** | **💬 提示词：**<br>`找到图中最高的人，`<br>`并描述他的着装，`<br>`用 Canvas 可视化`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/5-1.jpg" style="width: 200px" /> | <img src="./assets/examples/5-2.png" style="width: 400px" /> |
+| **全图检测** | **💬 提示词：**<br>`找到图中维生素C`<br>`含量最高的水果`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/6-1.png" style="width: 200px" /> | <img src="./assets/examples/6-2.png" style="width: 400px" /><br><br>*答案：猕猴桃（93mg/100g）* |
+| **姿态分析** | **💬 提示词：**<br>`请分析这是什么`<br>`瑜伽姿势，并用`<br>`canvas 显示关键点`<br><br>**🖼️ 输入图片：**<br><img src="./assets/examples/3-1.jpg" style="width: 200px" /> | <img src="./assets/examples/3-2.png" style="width: 400px" /> |
+
+
+
+
+## 常见问题
+
+- 支持哪些图片来源？
+  - STDIO：`file://` 与 `https://`
+  - Streamable HTTP：仅 `https://`
+- 支持哪些图片格式?
+  - Jpg, Jpeg, Webp, Png
+
+## 开发与调试
 
 如果你要修改这个 MCP 服务，可以开启监听模式，代码改动会自动重新编译：
 
 ```bash
-pnpm run watch
+npm run watch
 ```
-
 
 遇到问题时，可以用官方调试工具排查：
 
 ```bash
-pnpm run inspector
+npm run inspector
 ```
 
 ## 协议
