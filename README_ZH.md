@@ -63,10 +63,10 @@ DINO-X MCP 支持两种传输模式:
   "mcpServers": {
     "dinox-mcp": {
       "url": "https://mcp.deepdataspace.com/mcp?key=your-api-key"
-      }
     }
   }
 }
+
 ```
 
 #### 方式 B：使用 NPM 包本地运行（STDIO）
