@@ -6,12 +6,32 @@ import { fileURLToPath } from 'url';
 
 export const parseArgs = () => {
   const args: Record<string, string> = {};
-  process.argv.slice(2).forEach((arg) => {
+  const argv = process.argv.slice(2);
+  
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    
     if (arg.startsWith("--")) {
       const [key, value] = arg.slice(2).split("=");
-      args[key] = value;
+      
+      if (value !== undefined) {
+        // Format: --key=value
+        args[key] = value;
+      } else {
+        // Format: --key or --key value
+        const nextArg = argv[i + 1];
+        if (nextArg && !nextArg.startsWith("--")) {
+          // Format: --key value
+          args[key] = nextArg;
+          i++; // Skip the next argument as it's the value
+        } else {
+          // Format: --key (boolean flag)
+          args[key] = "";
+        }
+      }
     }
-  });
+  }
+  
   return args;
 }
 
@@ -134,7 +154,8 @@ function estimateTextWidth(text: string, fontSize: number): number {
 export async function visualizeDetections(
   imageUri: string,
   detections: DetectionResult[],
-  options: VisualizationOptions = {}
+  options: VisualizationOptions = {},
+  storageDir: string
 ): Promise<string> {
 
   let imageBuffer: Buffer;
@@ -237,7 +258,7 @@ export async function visualizeDetections(
   </svg>`;
   
   // Generate output path
-  const outputPath = generateOutputPath(imagePath);
+  const outputPath = generateOutputPath(imagePath, storageDir);
 
   // Composite SVG overlay onto image using Sharp
   await sharp(imageBuffer)
@@ -254,32 +275,18 @@ export async function visualizeDetections(
  * Get the default image storage directory based on the operating system
  * @returns default directory path
  */
-function getDefaultImageStorageDirectory(): string {
+export function getDefaultImageStorageDirectory(): string {
   const platform = os.platform();
 
   switch (platform) {
     case 'win32':
       return path.join(os.tmpdir(), 'dinox-mcp');
-    case 'darwin': // macOS
+    case 'darwin':
     case 'linux':
       return path.join(os.tmpdir(), 'dinox-mcp');
     default:
       return path.join(os.tmpdir(), 'dinox-mcp');
   }
-}
-
-/**
- * Get the configured image storage directory
- * Uses IMAGE_STORAGE_DIRECTORY environment variable if set, otherwise falls back to default
- * @returns image storage directory path
- */
-function getImageStorageDirectory(): string {
-  const envDir = process.env.IMAGE_STORAGE_DIRECTORY;
-  if (envDir) {
-    return envDir;
-  }
-
-  return getDefaultImageStorageDirectory();
 }
 
 /**
@@ -297,8 +304,7 @@ function ensureDirectoryExists(dirPath: string): void {
  * @param originalPath original image path
  * @returns output file path
  */
-function generateOutputPath(originalPath: string): string {
-  const storageDir = getImageStorageDirectory();
+function generateOutputPath(originalPath: string, storageDir: string): string {
   ensureDirectoryExists(storageDir);
 
   const ext = path.extname(originalPath);
